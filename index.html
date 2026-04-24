@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a1128">
+<meta name="description" content="O Conselheiro do Rei — Dashboard de produtividade gamificado com tema medieval">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>O Conselheiro do Rei</title>
+<style>
+/* =========================================================
+   O CONSELHEIRO DO REI — Tema Medieval/Fantasia Épica
+   ========================================================= */
+
+:root{
+  --bg-deep:#05091a;
+  --bg:#0a1128;
+  --bg-elev:#0f1836;
+  --bg-card:#0d1430;
+  --gold:#d4af37;
+  --gold-soft:#b8912e;
+  --gold-dim:#8b6f24;
+  --gold-glow:rgba(212,175,55,.35);
+  --ivory:#f5ead3;
+  --parchment:#e8dcb7;
+  --wine:#7a2e2e;
+  --wine-soft:#8e4141;
+  --ochre:#b8862b;
+  --ochre-soft:#d1a04a;
+  --moss:#4a6b3e;
+  --royal:#c3a355;           /* cor do rei — pintura do mapa */
+  --royal-dim:#7d6a38;
+  --danger:#9b3b3b;
+  --text:#e8dcb7;
+  --text-dim:#9b8f6d;
+  --text-faint:#5c5a4c;
+  --border:#2a3556;
+  --border-gold:rgba(212,175,55,.35);
+  --shadow-lg:0 10px 30px rgba(0,0,0,.5);
+  --radius:12px;
+  --radius-sm:8px;
+  --header:'Cinzel',serif;
+  --body:'Inter',system-ui,-apple-system,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--body);
+  background:
+    radial-gradient(ellipse at top,rgba(212,175,55,.06),transparent 50%),
+    radial-gradient(ellipse at bottom,rgba(122,46,46,.08),transparent 60%),
+    var(--bg);
+  color:var(--text);
+  line-height:1.5;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  /* reserva espaço para a bottom nav + safe-area do iOS,
+     evita que o último card do panel fique coberto */
+  padding-bottom:calc(140px + env(safe-area-inset-bottom));
+  scroll-padding-bottom:calc(140px + env(safe-area-inset-bottom));
+}
+
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;color:inherit}
+
+/* Scrollbar temática */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg-deep)}
+::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold-soft)}
+
+/* Container */
+.app{
+  max-width:900px;
+  margin:0 auto;
+  padding:24px 20px 48px;
+}
+
+/* Espaço extra ao final de cada painel para o último item
+   não encostar na bottom nav */
+.panel{padding-bottom:40px}
+
+/* ===== HEADER ===== */
+.header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  text-align:center;
+  padding:20px 16px 24px;
+}
+
+.avatar-wrap{
+  position:relative;
+  width:88px;
+  height:88px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#1a2548,#0a1128);
+  border:2px solid var(--gold);
+  box-shadow:0 0 30px var(--gold-glow),inset 0 0 20px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  animation:crownGlow 3s ease-in-out infinite alternate;
+}
+@keyframes crownGlow{
+  from{box-shadow:0 0 20px var(--gold-glow),inset 0 0 20px rgba(0,0,0,.5)}
+  to{box-shadow:0 0 40px var(--gold-glow),inset 0 0 30px rgba(0,0,0,.6)}
+}
+
+.avatar-wrap svg{width:48px;height:48px}
+
+.title-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
+.title{
+  font-family:var(--header);
+  font-size:clamp(1.5rem,5vw,2.1rem);
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--ivory);
+  text-shadow:0 2px 8px rgba(0,0,0,.6),0 0 20px rgba(212,175,55,.15);
+}
+.subtitle{
+  font-size:.85rem;
+  color:var(--text-dim);
+  font-style:italic;
+  letter-spacing:.04em;
+}
+.subtitle b{color:var(--gold);font-style:normal;font-weight:600}
+
+.xp-bar{
+  width:100%;
+  max-width:540px;
+  height:6px;
+  background:var(--bg-elev);
+  border-radius:3px;
+  overflow:hidden;
+  position:relative;
+  border:1px solid var(--border);
+  margin-top:4px;
+}
+.xp-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold-soft),var(--gold),var(--ochre-soft));
+  width:0%;
+  transition:width .6s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 12px var(--gold-glow);
+}
+
+.stats-row{
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+  max-width:540px;
+  font-size:.8rem;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.stats-row span{color:var(--text-dim)}
+.stats-row b{color:var(--ivory);font-weight:600}
+.stats-row .gold{color:var(--gold)}
+
+.xp-top{
+  position:absolute;top:20px;right:20px;
+  text-align:right;
+  font-family:var(--header);
+  letter-spacing:.1em;
+}
+.xp-top .label{font-size:.7rem;color:var(--text-dim);text-transform:uppercase}
+.xp-top .val{font-size:1.6rem;color:var(--gold);font-weight:700;line-height:1}
+
+/* ===== TOP ACTIONS ===== */
+.top-actions{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin:20px 0 8px;
+}
+.btn-ghost{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 18px;
+  background:var(--bg-card);
+  border:1px solid var(--border-gold);
+  border-radius:var(--radius-sm);
+  color:var(--ivory);
+  font-size:.85rem;
+  font-weight:500;
+  letter-spacing:.04em;
+  text-transform:capitalize;
+  transition:all .2s;
+}
+.btn-ghost:hover{
+  border-color:var(--gold);
+  background:var(--bg-elev);
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+.btn-ghost svg{width:16px;height:16px;stroke:var(--gold)}
+
+.version{
+  text-align:right;
+  font-size:.75rem;
+  color:var(--text-faint);
+  font-style:italic;
+  margin:8px 4px 0;
+}
+
+/* ===== CTA principal ===== */
+.btn-primary{
+  width:100%;
+  padding:18px;
+  margin:12px 0;
+  background:linear-gradient(180deg,var(--bg-elev),var(--bg-card));
+  border:1px solid var(--gold);
+  border-radius:var(--radius);
+  color:var(--gold);
+  font-family:var(--header);
+  font-size:.9rem;
+  font-weight:700;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .2s;
+  box-shadow:inset 0 1px 0 rgba(212,175,55,.15);
+}
+.btn-primary:hover{
+  background:linear-gradient(180deg,#152045,#101933);
+  box-shadow:0 0 24px var(--gold-glow),inset 0 1px 0 rgba(212,175,55,.3);
+  transform:translateY(-1px);
+}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary .plus{font-size:1.4rem;line-height:1}
+
+/* ===== FILTROS ===== */
+.filters{
+  display:flex;
+  gap:10px;
+  margin:16px 0;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.filter{
+  padding:8px 18px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text-dim);
+  font-size:.75rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:600;
+  transition:all .2s;
+}
+.filter:hover{color:var(--ivory);border-color:var(--border-gold)}
+.filter.active{
+  color:var(--gold);
+  border-color:var(--gold);
+  background:rgba(212,175,55,.08);
+  box-shadow:0 0 12px rgba(212,175,55,.15);
+}
+
+/* ===== CARDS DE MISSÃO ===== */
+.mission-list{display:flex;flex-direction:column;gap:14px;margin:16px 0}
+
+.mission{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:14px;
+  padding:16px 18px;
+  background:var(--bg-card);
+  border:1px solid var(--border-gold);
+  border-radius:var(--radius);
+  transition:all .25s;
+  position:relative;
+  overflow:hidden;
+}
+.mission::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--gold),var(--gold-dim));
+  opacity:.6;
+}
+.mission:hover{
+  border-color:var(--gold);
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,.35);
+}
+.mission.done{opacity:.55}
+.mission.done .mission-title{text-decoration:line-through;color:var(--text-dim)}
+
+.check{
+  width:34px;height:34px;
+  border:2px solid var(--border-gold);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  flex-shrink:0;
+}
+.check:hover{border-color:var(--gold);background:rgba(212,175,55,.08)}
+.check svg{width:18px;height:18px;stroke:var(--gold);opacity:0;transition:opacity .2s}
+.mission.done .check svg,.check:hover svg{opacity:1}
+.mission.done .check{background:rgba(212,175,55,.1);border-color:var(--gold)}
+
+.mission-body{min-width:0;display:flex;flex-direction:column;gap:4px}
+.mission-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mission-title{
+  font-family:var(--header);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--ivory);
+  line-height:1.25;
+}
+.mission-meta{
+  font-size:.75rem;
+  color:var(--text-dim);
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+}
+.mission-meta .sep{color:var(--text-faint)}
+.mission-desc{
+  font-size:.82rem;
+  color:var(--text-dim);
+  margin-top:4px;
+  font-style:italic;
+  line-height:1.4;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.7rem;
+  font-weight:600;
+  letter-spacing:.05em;
+  white-space:nowrap;
+}
+.badge.rank{
+  background:rgba(195,163,85,.12);
+  color:var(--ochre-soft);
+  border:1px solid rgba(195,163,85,.3);
+}
+.badge.rank.gold{
+  background:rgba(212,175,55,.12);
+  color:var(--gold);
+  border:1px solid rgba(212,175,55,.35);
+}
+.badge.rank.wine{
+  background:rgba(142,65,65,.18);
+  color:#d18b8b;
+  border:1px solid rgba(142,65,65,.4);
+}
+.badge.tag{
+  background:rgba(74,107,62,.18);
+  color:#9bc082;
+  border:1px solid rgba(74,107,62,.4);
+  font-size:.68rem;
+  padding:3px 8px;
+  text-transform:lowercase;
+}
+
+.mission-actions{display:flex;flex-direction:column;gap:6px}
+.icon-btn{
+  width:30px;height:30px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.icon-btn:hover{border-color:var(--gold);background:rgba(212,175,55,.08)}
+.icon-btn svg{width:14px;height:14px;stroke:var(--text-dim)}
+.icon-btn:hover svg{stroke:var(--gold)}
+.icon-btn.danger:hover{border-color:var(--danger);background:rgba(155,59,59,.1)}
+.icon-btn.danger:hover svg{stroke:#d18b8b}
+
+.empty{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--text-dim);
+  font-style:italic;
+  border:1px dashed var(--border);
+  border-radius:var(--radius);
+  margin:16px 0;
+}
+
+/* ===== BOTTOM NAV ===== */
+.bottomnav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:linear-gradient(180deg,rgba(10,17,40,.85),var(--bg-deep));
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border-gold);
+  padding:12px 8px calc(12px + env(safe-area-inset-bottom));
+  display:flex;
+  justify-content:space-around;
+  z-index:50;
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 10px;
+  min-width:60px;
+  color:var(--text-dim);
+  transition:all .25s;
+  position:relative;
+}
+.nav-item svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5}
+.nav-item span{
+  font-size:.62rem;
+  letter-spacing:.08em;
+  font-weight:600;
+  text-transform:uppercase;
+}
+.nav-item.active{
+  color:var(--gold);
+  text-shadow:0 0 10px var(--gold-glow);
+}
+.nav-item.active::before{
+  content:'';
+  position:absolute;
+  top:-12px;left:50%;transform:translateX(-50%);
+  width:36px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  box-shadow:0 0 10px var(--gold);
+}
+.nav-item.active svg{filter:drop-shadow(0 0 4px var(--gold-glow))}
+
+/* ===== PANELS (telas) ===== */
+.panel{display:none;animation:fadeIn .3s ease-out}
+.panel.active{display:block}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.section-title{
+  font-family:var(--header);
+  font-size:1.1rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin:24px 0 4px;
+  text-align:center;
+}
+.section-sub{
+  text-align:center;
+  font-size:.8rem;
+  color:var(--text-dim);
+  font-style:italic;
+  margin-bottom:16px;
+}
+
+/* ===== MAPA ===== */
+.map-wrap{
+  background:linear-gradient(180deg,#060b1f,var(--bg-deep));
+  border:1px solid var(--border-gold);
+  border-radius:var(--radius);
+  padding:12px;
+  margin:16px 0;
+  overflow:hidden;
+  position:relative;
+}
+.map-wrap svg{width:100%;height:auto;display:block;max-height:70vh}
+.regiao{
+  fill:#1a2550;
+  stroke:#2a3556;
+  stroke-width:.8;
+  transition:fill .6s ease, stroke .3s, filter .3s;
+  cursor:pointer;
+}
+.regiao:hover{stroke:var(--gold);stroke-width:1.2}
+.regiao.painted{
+  fill:var(--royal);
+  stroke:var(--gold);
+  filter:drop-shadow(0 0 3px rgba(212,175,55,.35));
+}
+.map-sea{fill:#060b1f}
+.map-label{
+  font-family:var(--body);
+  font-size:8px;
+  fill:var(--text-faint);
+  pointer-events:none;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  font-weight:600;
+}
+.regiao.painted + .map-label,.painted-label{fill:var(--ivory)}
+
+.map-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:16px 0;
+}
+.map-stat{
+  background:var(--bg-card);
+  border:1px solid var(--border-gold);
+  border-radius:var(--radius-sm);
+  padding:12px 10px;
+  text-align:center;
+}
+.map-stat .n{
+  font-family:var(--header);
+  font-size:1.3rem;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:.05em;
+}
+.map-stat .l{
+  font-size:.65rem;
+  color:var(--text-dim);
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-top:4px;
+}
+
+/* ===== MODAL ===== */
+.modal-bg{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;
+  z-index:100;
+  padding:16px;
+  animation:fadeIn .2s;
+}
+.modal-bg.active{display:flex}
+.modal{
+  background:linear-gradient(180deg,var(--bg-elev),var(--bg-card));
+  border:1px solid var(--gold);
+  border-radius:var(--radius);
+  padding:24px;
+  max-width:480px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  box-shadow:var(--shadow-lg),0 0 40px var(--gold-glow);
+  animation:modalIn .3s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes modalIn{
+  from{transform:scale(.9);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.modal h2{
+  font-family:var(--header);
+  font-size:1.2rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:4px;
+  text-align:center;
+}
+.modal .sub{text-align:center;color:var(--text-dim);font-size:.8rem;margin-bottom:18px;font-style:italic}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:.7rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold-soft);
+  font-weight:600;
+  margin-bottom:6px;
+}
+.field input,.field textarea,.field select{
+  width:100%;
+  padding:10px 12px;
+  background:var(--bg-deep);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--ivory);
+  font-size:.9rem;
+  transition:all .2s;
+}
+.field textarea{resize:vertical;min-height:70px;font-family:inherit}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(212,175,55,.15);
+}
+.field .hint{font-size:.7rem;color:var(--text-faint);margin-top:4px;font-style:italic}
+
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tag-chip{
+  padding:6px 12px;
+  background:var(--bg-deep);
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:.72rem;
+  transition:all .15s;
+  cursor:pointer;
+}
+.tag-chip:hover{border-color:var(--gold-soft)}
+.tag-chip.active{
+  border-color:var(--gold);
+  background:rgba(212,175,55,.12);
+  color:var(--gold);
+}
+
+.radio-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.radio-card{
+  padding:12px 8px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  text-align:center;
+  font-size:.72rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:all .2s;
+  background:var(--bg-deep);
+}
+.radio-card:hover{border-color:var(--border-gold);color:var(--ivory)}
+.radio-card.active{
+  border-color:var(--gold);
+  background:rgba(212,175,55,.1);
+  color:var(--gold);
+  box-shadow:0 0 12px rgba(212,175,55,.15);
+}
+.radio-card .ic{display:block;font-size:1.1rem;margin-bottom:4px}
+.radio-card small{
+  display:block;margin-top:3px;
+  font-size:.65rem;
+  color:var(--text-faint);
+  letter-spacing:.08em;
+  font-weight:500;
+}
+.radio-card.active small{color:var(--gold-soft)}
+
+.modal-actions{
+  display:flex;gap:10px;justify-content:flex-end;
+  margin-top:20px;flex-wrap:wrap;
+}
+.btn{
+  padding:10px 20px;
+  border-radius:var(--radius-sm);
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  transition:all .2s;
+  border:1px solid transparent;
+}
+.btn-cancel{
+  background:transparent;
+  border-color:var(--border);
+  color:var(--text-dim);
+}
+.btn-cancel:hover{border-color:var(--danger);color:#d18b8b}
+.btn-save{
+  background:linear-gradient(180deg,var(--gold),var(--gold-soft));
+  color:var(--bg-deep);
+  box-shadow:0 4px 12px rgba(212,175,55,.3);
+}
+.btn-save:hover{box-shadow:0 4px 20px rgba(212,175,55,.5);transform:translateY(-1px)}
+.btn-danger{
+  background:transparent;
+  border-color:var(--danger);
+  color:#d18b8b;
+}
+.btn-danger:hover{background:rgba(155,59,59,.15)}
+
+/* ===== POMODORO / BATALHA ===== */
+.battle{
+  text-align:center;
+  padding:20px 0;
+}
+.battle-title{
+  font-family:var(--header);
+  font-size:1.6rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin:8px 0;
+}
+.battle-sub{
+  color:var(--text-dim);
+  font-style:italic;
+  font-size:.85rem;
+  margin-bottom:20px;
+}
+
+.timer-ring{
+  width:260px;height:260px;margin:20px auto;
+  position:relative;
+  filter:drop-shadow(0 0 20px var(--gold-glow));
+}
+.timer-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:var(--bg-elev);stroke-width:8}
+.ring-fill{
+  fill:none;stroke:url(#goldGrad);stroke-width:8;stroke-linecap:round;
+  stroke-dasharray:0 1000;
+  transition:stroke-dasharray .9s linear;
+}
+.timer-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;
+}
+.timer-time{
+  font-family:var(--header);
+  font-size:3.2rem;
+  font-weight:700;
+  color:var(--ivory);
+  letter-spacing:.03em;
+  line-height:1;
+}
+.timer-phase{
+  font-size:.7rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:600;
+}
+.timer-mission{
+  max-width:220px;
+  font-size:.75rem;
+  color:var(--text-dim);
+  font-style:italic;
+  text-align:center;
+  margin-top:6px;
+  padding:0 10px;
+  line-height:1.3;
+}
+
+.battle-actions{
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  margin:24px 0 12px;
+}
+
+.battle-info{
+  background:var(--bg-card);
+  border:1px solid var(--border-gold);
+  border-radius:var(--radius);
+  padding:16px;
+  margin:16px 0;
+  font-size:.85rem;
+  color:var(--text-dim);
+  line-height:1.6;
+}
+.battle-info b{color:var(--gold);font-weight:600}
+
+/* ===== NOTIFICATION ===== */
+.notif{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-120%);
+  background:linear-gradient(180deg,var(--bg-elev),var(--bg-card));
+  border:1px solid var(--gold);
+  border-radius:var(--radius);
+  padding:14px 22px;
+  max-width:90%;
+  color:var(--ivory);
+  font-size:.85rem;
+  z-index:200;
+  box-shadow:var(--shadow-lg),0 0 30px var(--gold-glow);
+  transition:transform .4s cubic-bezier(.2,.9,.3,1.2);
+  display:flex;align-items:center;gap:12px;
+}
+.notif.show{transform:translateX(-50%) translateY(0)}
+.notif.achievement{border-color:var(--gold);animation:pulse 1.2s ease-in-out}
+@keyframes pulse{
+  0%,100%{box-shadow:var(--shadow-lg),0 0 30px var(--gold-glow)}
+  50%{box-shadow:var(--shadow-lg),0 0 60px var(--gold)}
+}
+
+/* ===== CONTROLES FLUTUANTES ===== */
+.fab-controls{
+  position:fixed;top:16px;right:16px;
+  display:flex;gap:8px;
+  z-index:40;
+}
+.fab{
+  width:40px;height:40px;
+  border-radius:50%;
+  background:var(--bg-card);
+  border:1px solid var(--border-gold);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+  backdrop-filter:blur(8px);
+}
+.fab:hover{border-color:var(--gold);transform:scale(1.05)}
+.fab svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:1.8}
+.fab.muted svg{stroke:var(--text-faint)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:500px){
+  .app{padding:16px 14px 40px}
+  .title{font-size:1.3rem}
+  .xp-top{position:static;margin-top:4px}
+  .mission{grid-template-columns:auto 1fr;padding:14px}
+  .mission-actions{grid-column:1 / -1;flex-direction:row;justify-content:flex-end;margin-top:6px}
+  .timer-ring{width:220px;height:220px}
+  .timer-time{font-size:2.6rem}
+  .radio-row{grid-template-columns:1fr}
+  .nav-item{min-width:auto;padding:4px 6px}
+  .nav-item span{font-size:.56rem}
+  .map-stats{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .map-stat .n{font-size:1.1rem}
+}
+
+/* Splash quando em standalone */
+@media all and (display-mode:standalone){
+  body{padding-top:env(safe-area-inset-top)}
+}
+</style>
+</head>
+<body>
+
+<!-- Controles flutuantes -->
+<div class="fab-controls">
+  <button class="fab" id="btn-mute" title="Som">
+    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5L6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13"/></svg>
+  </button>
+</div>
+
+<div class="app">
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="avatar-wrap">
+    <!-- Coroa dourada -->
+    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="crownG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f4d57a"/>
+          <stop offset="1" stop-color="#b8912e"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#crownG)" stroke="#8b6f24" stroke-width=".8"
+        d="M8 30 L6 14 L14 22 L20 10 L24 18 L28 10 L34 22 L42 14 L40 30 Z"/>
+      <rect x="8" y="30" width="32" height="5" rx="1" fill="url(#crownG)" stroke="#8b6f24" stroke-width=".8"/>
+      <circle cx="24" cy="32.5" r="1.2" fill="#7a2e2e"/>
+      <circle cx="14" cy="32.5" r="1" fill="#3a5068"/>
+      <circle cx="34" cy="32.5" r="1" fill="#3a5068"/>
+      <circle cx="20" cy="10" r="1.4" fill="#f4d57a"/>
+      <circle cx="28" cy="10" r="1.4" fill="#f4d57a"/>
+      <circle cx="6" cy="14" r="1.4" fill="#f4d57a"/>
+      <circle cx="42" cy="14" r="1.4" fill="#f4d57a"/>
+    </svg>
+  </div>
+
+  <div class="title-row">
+    <h1 class="title">O Conselheiro do Rei</h1>
+  </div>
+  <div class="subtitle" id="rank-subtitle"><b>Aprendiz do Pergaminho</b> — <span id="rank-flavor">Primeiras letras sob a tutela do Rei</span></div>
+
+  <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+
+  <div class="stats-row">
+    <span>Nível: <b id="stat-rank">Aprendiz do Pergaminho</b></span>
+    <span><b id="stat-next">50 XP</b> até próxima patente</span>
+  </div>
+  <div class="stats-row">
+    <span>Domínio do Continente: <b id="stat-regions">0/40</b> gabinetes</span>
+    <span>Missões cumpridas: <b class="gold" id="stat-done">0</b></span>
+  </div>
+
+  <div class="xp-top">
+    <div class="label">XP</div>
+    <div class="val" id="xp-total">0</div>
+  </div>
+</header>
+
+<!-- ============ TOP ACTIONS ============ -->
+<div class="top-actions">
+  <button class="btn-ghost" id="btn-save" title="Salvar progresso em arquivo">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    Exportar Crônica
+  </button>
+  <button class="btn-ghost" id="btn-load" title="Carregar progresso">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+    Restaurar Crônica
+  </button>
+  <button class="btn-ghost" id="btn-reset" title="Reiniciar jogo">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+    Reiniciar
+  </button>
+</div>
+<div class="version">v1.0 · O Conselheiro</div>
+
+<!-- ============ PANELS ============ -->
+
+<!-- Panel: Continente (Mapa) -->
+<section class="panel" data-panel="continente">
+  <h2 class="section-title">Mapa do Continente</h2>
+  <p class="section-sub">O Rei estende suas bandeiras sobre a Europa. Cada vitória pinta uma nova região.</p>
+
+  <div class="map-stats">
+    <div class="map-stat"><div class="n" id="m-dominio">0</div><div class="l">Domínio</div></div>
+    <div class="map-stat"><div class="n" id="m-streak">0</div><div class="l">Dias em marcha</div></div>
+    <div class="map-stat"><div class="n" id="m-pomos">0</div><div class="l">Batalhas</div></div>
+  </div>
+
+  <div class="map-wrap" id="map-wrap"><!-- SVG injetado por JS --></div>
+
+  <div class="battle-info">
+    <b>Como conquistar:</b> cada Batalha (Pomodoro) pinta uma região. A cada 3 missões concluídas, uma província se rende. Cumprir missões dos 3 tipos no mesmo dia conquista um bônus (<b>diversidade estratégica</b>). A inércia de um dia sem missão faz o Rei perder uma província.
+  </div>
+</section>
+
+<!-- Panel: Razão de Estado (Trabalho) -->
+<section class="panel active" data-panel="trabalho">
+  <h2 class="section-title">Razão de Estado</h2>
+  <p class="section-sub">As tarefas do Gabinete. O expediente do Rei.</p>
+
+  <button class="btn-primary" onclick="abrirModalMissao('trabalho')">
+    <span class="plus">+</span> Registrar Nova Missão
+  </button>
+
+  <div class="filters">
+    <button class="filter active" data-filter="pendentes" data-type="trabalho">Pendentes</button>
+    <button class="filter" data-filter="concluidas" data-type="trabalho">Concluídas</button>
+    <button class="filter" data-filter="todas" data-type="trabalho">Todas</button>
+  </div>
+
+  <div class="mission-list" id="list-trabalho"></div>
+</section>
+
+<!-- Panel: Círculo de Virtù (Estudo) -->
+<section class="panel" data-panel="estudo">
+  <h2 class="section-title">Círculo de Virtù</h2>
+  <p class="section-sub">O Príncipe há de saber. Letras, Leis, e a arte de conduzir homens.</p>
+
+  <button class="btn-primary" onclick="abrirModalMissao('estudo')">
+    <span class="plus">+</span> Registrar Nova Missão
+  </button>
+
+  <div class="filters">
+    <button class="filter active" data-filter="pendentes" data-type="estudo">Pendentes</button>
+    <button class="filter" data-filter="concluidas" data-type="estudo">Concluídas</button>
+    <button class="filter" data-filter="todas" data-type="estudo">Todas</button>
+  </div>
+
+  <div class="mission-list" id="list-estudo"></div>
+</section>
+
+<!-- Panel: Minhas Armas (Físico) -->
+<section class="panel" data-panel="fisico">
+  <h2 class="section-title">Minhas Armas</h2>
+  <p class="section-sub">O corpo forja o guerreiro. Cada missão cumprida concede Vigor (+25% XP por 24h).</p>
+
+  <button class="btn-primary" onclick="abrirModalMissao('fisico')">
+    <span class="plus">+</span> Registrar Nova Missão
+  </button>
+
+  <div class="filters">
+    <button class="filter active" data-filter="pendentes" data-type="fisico">Pendentes</button>
+    <button class="filter" data-filter="concluidas" data-type="fisico">Concluídas</button>
+    <button class="filter" data-filter="todas" data-type="fisico">Todas</button>
+  </div>
+
+  <div class="mission-list" id="list-fisico"></div>
+
+  <div id="vigor-status" style="display:none" class="battle-info">
+    <b>Vigor ativo:</b> multiplicador de <b id="vigor-mult">1.25x</b> em todos os XP ganhos. Expira em <b id="vigor-exp">-</b>.
+  </div>
+</section>
+
+<!-- Panel: Disputa Política (Pomodoro) -->
+<section class="panel" data-panel="batalha">
+  <h2 class="section-title">Disputa Política</h2>
+  <p class="section-sub">25 minutos na arena. Concentração total. A vitória pinta o mapa.</p>
+
+  <div class="battle">
+    <div class="timer-ring">
+      <svg viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f4d57a"/>
+            <stop offset="1" stop-color="#b8912e"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="100" cy="100" r="88"/>
+        <circle class="ring-fill" id="ring-fill" cx="100" cy="100" r="88"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-time" id="timer-time">25:00</div>
+        <div class="timer-phase" id="timer-phase">Pronto</div>
+      </div>
+    </div>
+    <div class="timer-mission" id="timer-mission">Nenhuma missão vinculada</div>
+
+    <div class="battle-actions">
+      <button class="btn btn-save" id="btn-battle-start">Iniciar Batalha</button>
+      <button class="btn btn-cancel" id="btn-battle-link">Vincular Missão</button>
+      <button class="btn btn-cancel" id="btn-battle-reset" style="display:none">Render-se</button>
+    </div>
+
+    <div class="battle-info">
+      <b>Recompensas da Batalha:</b><br>
+      • Completar 25 min sem render-se: <b>+20 XP</b> e <b>1 província</b> pintada no mapa.<br>
+      • Concluir a missão vinculada durante a batalha: <b>+30 XP</b> de espólio.<br>
+      • Render-se: nenhuma recompensa. O Rei observa.
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bottomnav">
+  <button class="nav-item" data-nav="continente" title="Mapa">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3l-6 3v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>
+    <span>Continente</span>
+  </button>
+  <button class="nav-item active" data-nav="trabalho" title="Razão de Estado">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2h-2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 12h8M8 16h5"/></svg>
+    <span>Razão</span>
+  </button>
+  <button class="nav-item" data-nav="estudo" title="Círculo de Virtù">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 012-2h13v18H6.5a2.5 2.5 0 010-5H19"/></svg>
+    <span>Virtù</span>
+  </button>
+  <button class="nav-item" data-nav="fisico" title="Minhas Armas">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5L20.5 9.5M3 21l6-6M13 5l6 6-8 8-6-6 8-8zM3 21l3-3"/></svg>
+    <span>Armas</span>
+  </button>
+  <button class="nav-item" data-nav="batalha" title="Disputa Política">
+    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M8 2h8M12 5V2"/></svg>
+    <span>Batalha</span>
+  </button>
+</nav>
+
+<!-- ============ MODAL MISSÃO ============ -->
+<div class="modal-bg" id="modal-missao">
+  <div class="modal">
+    <h2 id="modal-title">Nova Missão</h2>
+    <p class="sub" id="modal-sub">Defina a próxima empreitada do Conselheiro</p>
+
+    <div class="field">
+      <label>Categoria</label>
+      <div class="radio-row" id="tipo-row">
+        <div class="radio-card" data-tipo="trabalho"><span class="ic">⚖️</span>Razão de Estado</div>
+        <div class="radio-card" data-tipo="estudo"><span class="ic">📜</span>Círculo de Virtù</div>
+        <div class="radio-card" data-tipo="fisico"><span class="ic">⚔️</span>Minhas Armas</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Peso da Missão</label>
+      <div class="radio-row" id="peso-row">
+        <div class="radio-card" data-peso="leve"><span class="ic">🪶</span>Ofício<br><small>×0,5</small></div>
+        <div class="radio-card active" data-peso="padrao"><span class="ic">⚔️</span>Empreitada<br><small>×1</small></div>
+        <div class="radio-card" data-peso="pesada"><span class="ic">🏰</span>Façanha<br><small>×2</small></div>
+      </div>
+      <div class="hint" id="peso-preview">XP estimado: <b>30</b> (antes de Vigor/Batalha)</div>
+    </div>
+
+    <div class="field">
+      <label>Título da Missão</label>
+      <input type="text" id="f-titulo" maxlength="120" placeholder="Ex: Parecer sobre PL 459/2025">
+    </div>
+
+    <div class="field">
+      <label>Descrição (opcional)</label>
+      <textarea id="f-desc" maxlength="500" placeholder="Detalhes, cenários, interessados..."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Prazo</label>
+      <input type="date" id="f-data">
+    </div>
+
+    <div class="field">
+      <label>Tag</label>
+      <div class="tag-row" id="tag-existentes"></div>
+      <input type="text" id="f-newtag" placeholder="+ Nova tag (enter para adicionar)" style="margin-top:8px">
+      <div class="hint">Tags organizam missões por projeto, gabinete ou matéria.</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="btn-del-missao" style="display:none">Excluir</button>
+      <button class="btn btn-cancel" onclick="fecharModal('modal-missao')">Cancelar</button>
+      <button class="btn btn-save" id="btn-save-missao">Selar Pergaminho</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL VINCULAR BATALHA ============ -->
+<div class="modal-bg" id="modal-vincular">
+  <div class="modal">
+    <h2>Vincular Missão à Batalha</h2>
+    <p class="sub">Escolha a missão pela qual se entrará em campo</p>
+    <div id="list-vincular" style="max-height:50vh;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="fecharModal('modal-vincular')">Cancelar</button>
+      <button class="btn btn-save" id="btn-desvincular">Desvincular</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL CONFIRM RESET ============ -->
+<div class="modal-bg" id="modal-reset">
+  <div class="modal">
+    <h2>Reiniciar a Crônica?</h2>
+    <p class="sub">Todo o progresso — XP, missões, mapa, patente — será perdido. Considere antes exportar uma crônica.</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="fecharModal('modal-reset')">Não</button>
+      <button class="btn btn-danger" id="btn-confirm-reset">Sim, reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Input escondido para load -->
+<input type="file" id="file-load" accept="application/json" style="display:none">
+
+<!-- Notificação -->
+<div class="notif" id="notif"></div>
+
+<script>
+/* =============================================================
+   O CONSELHEIRO DO REI — Core Engine
+   Lore: Maquiavel (Niccolò) assessora seu Rei. Cada missão
+   cumprida amplia a Razão de Estado sobre o continente.
+   ============================================================= */
+
+/* =========== RANKS (Patentes de Prestígio) =========== */
+const RANKS = [
+  { n:'Aprendiz do Pergaminho',       min:0,     flavor:'Primeiras letras sob a tutela do Rei' },
+  { n:'Escriba',                      min:50,    flavor:'Copista dos pergaminhos da Corte' },
+  { n:'Escudeiro',                    min:200,   flavor:'Aprende as armas e o silêncio' },
+  { n:'Cavaleiro do Reino',           min:500,   flavor:'Monta, lida, combate pelo Rei' },
+  { n:'Barão',                        min:1000,  flavor:'Senhor de pequenas terras' },
+  { n:'Visconde',                     min:2000,  flavor:'Vice-conde, braço do Conde' },
+  { n:'Conde',                        min:3500,  flavor:'Governa comarca em nome do Rei' },
+  { n:'Marquês',                      min:5500,  flavor:'Guardião das marcas fronteiriças' },
+  { n:'Duque',                        min:8000,  flavor:'Pariu do Rei, comanda ducado' },
+  { n:'Grão-Duque',                   min:12000, flavor:'Soberano dentro do Reino' },
+  { n:'Príncipe Consultor',           min:17000, flavor:'Voz que o Rei sempre ouve' },
+  { n:'Grande Conselheiro — O Maquiavel', min:25000, flavor:'O Príncipe, por trás do trono' }
+];
+
+/* =========== CONFIG =========== */
+const XP_BASE = { trabalho:30, estudo:25, fisico:20 };
+/* Peso da missão — multiplicador sobre o XP base da categoria.
+   Pensado para o advogado/coordenador separar tarefas triviais
+   (despachos curtos) de façanhas longas (parecer, audiência). */
+const PESO_MULT = { leve:0.5, padrao:1, pesada:2 };
+const PESO_LABEL = {
+  leve:   { nome:'Ofício',     icone:'🪶', cor:'wine' },
+  padrao: { nome:'Empreitada', icone:'⚔️', cor:''     }, // ocre (default)
+  pesada: { nome:'Façanha',    icone:'🏰', cor:'gold' }
+};
+const POMO_LEN = 25 * 60;        // 25 minutos
+const POMO_BONUS = 20;           // XP por pomodoro completo
+const POMO_TASK_BONUS = 30;      // XP extra se concluir missão durante
+const VIGOR_MULT = 1.25;
+const VIGOR_HOURS = 24;
+const INERCIA_HOURS = 24;        // perde 1 região a cada 24h sem missão
+const DIA_MS = 86400000;
+
+/* XP real calculado de uma missão (peso × base) */
+function xpDaMissao(m){
+  const base = XP_BASE[m.tipo] || 20;
+  const mult = PESO_MULT[m.peso||'padrao'] ?? 1;
+  return Math.round(base * mult);
+}
+
+/* =========== REGIÕES DO MAPA (40 = 40 gabinetes) =========== */
+/* Coordenadas aproximadas em viewBox 1000x800 — estilizadas */
+const REGIONS = [
+  // Peninsula Itálica (foco — terra de Maquiavel)
+  { id:'florenca',    nome:'Florença',        d:'M500 480 L530 475 L540 500 L515 510 L495 498 Z' },
+  { id:'milao',       nome:'Milão',           d:'M475 440 L515 435 L520 465 L485 472 L472 458 Z' },
+  { id:'veneza',      nome:'Veneza',          d:'M525 430 L565 425 L575 450 L540 458 L522 450 Z' },
+  { id:'genova',      nome:'Gênova',          d:'M445 475 L478 470 L485 490 L455 495 L440 485 Z' },
+  { id:'papal',       nome:'Estados Papais',  d:'M515 515 L555 510 L565 545 L525 552 L510 535 Z' },
+  { id:'napoles',     nome:'Nápoles',         d:'M535 560 L585 555 L595 600 L548 610 L530 585 Z' },
+  { id:'sicilia',     nome:'Sicília',         d:'M510 625 L560 622 L565 645 L515 648 Z' },
+  { id:'sardenha',    nome:'Sardenha',        d:'M455 555 L482 552 L486 590 L458 593 Z' },
+  { id:'ferrara',     nome:'Ferrara',         d:'M505 458 L535 455 L540 478 L510 482 Z' },
+  { id:'mantua',      nome:'Mântua',          d:'M488 462 L510 458 L515 478 L492 482 Z' },
+  { id:'urbino',      nome:'Urbino',          d:'M545 485 L572 482 L578 508 L550 511 Z' },
+  { id:'saboia',      nome:'Saboia',          d:'M445 442 L475 438 L480 462 L450 465 Z' },
+  { id:'modena',      nome:'Modena',          d:'M487 480 L510 478 L512 498 L490 500 Z' },
+  { id:'lucca',       nome:'Lucca',           d:'M478 495 L498 493 L500 510 L480 512 Z' },
+  { id:'siena',       nome:'Siena',           d:'M495 508 L515 505 L520 525 L500 528 Z' },
+
+  // Ibéria
+  { id:'castela',     nome:'Castela',         d:'M290 480 L380 470 L395 545 L310 560 L285 530 Z' },
+  { id:'aragao',      nome:'Aragão',          d:'M380 465 L425 460 L430 510 L390 515 Z' },
+  { id:'portugal',    nome:'Portugal',        d:'M255 485 L290 482 L295 555 L262 558 Z' },
+  { id:'navarra',     nome:'Navarra',         d:'M360 450 L395 445 L400 470 L365 475 Z' },
+  { id:'granada',     nome:'Granada',         d:'M310 560 L375 555 L380 580 L320 585 Z' },
+
+  // Britânica
+  { id:'inglaterra',  nome:'Inglaterra',      d:'M355 285 L410 278 L418 340 L365 350 L350 320 Z' },
+  { id:'escocia',     nome:'Escócia',         d:'M370 220 L415 215 L420 265 L375 275 Z' },
+  { id:'irlanda',     nome:'Irlanda',         d:'M295 275 L335 272 L340 325 L298 330 Z' },
+
+  // França / Borgonha / Baixos
+  { id:'franca',      nome:'Reino da França', d:'M395 355 L468 348 L478 432 L410 440 L388 405 Z' },
+  { id:'borgonha',    nome:'Borgonha',        d:'M460 370 L495 365 L502 405 L468 410 Z' },
+  { id:'flandres',    nome:'Flandres',        d:'M455 320 L495 315 L500 350 L460 355 Z' },
+  { id:'holanda',     nome:'Holanda',         d:'M475 290 L510 287 L515 317 L480 320 Z' },
+
+  // Império / Central
+  { id:'baviera',     nome:'Baviera',         d:'M510 380 L560 375 L568 415 L515 420 Z' },
+  { id:'saxonia',     nome:'Saxônia',         d:'M515 335 L568 330 L575 372 L518 377 Z' },
+  { id:'brandemburgo',nome:'Brandemburgo',    d:'M570 300 L625 295 L632 340 L575 345 Z' },
+  { id:'austria',     nome:'Áustria',         d:'M545 400 L605 395 L615 432 L552 438 Z' },
+  { id:'boemia',      nome:'Boêmia',          d:'M560 355 L612 350 L618 392 L565 397 Z' },
+
+  // Norte
+  { id:'dinamarca',   nome:'Dinamarca',       d:'M525 235 L560 230 L565 275 L528 280 Z' },
+  { id:'suecia',      nome:'Suécia',          d:'M580 130 L640 125 L655 245 L590 252 Z' },
+  { id:'noruega',     nome:'Noruega',         d:'M520 110 L580 105 L595 220 L538 225 Z' },
+
+  // Leste
+  { id:'polonia',     nome:'Polônia',         d:'M620 310 L705 305 L715 372 L625 380 Z' },
+  { id:'hungria',     nome:'Hungria',         d:'M610 395 L700 390 L710 438 L615 443 Z' },
+  { id:'lituania',    nome:'Lituânia',        d:'M690 260 L760 255 L770 308 L700 313 Z' },
+  { id:'moscovia',    nome:'Moscóvia',        d:'M770 220 L920 215 L930 360 L780 370 Z' },
+  { id:'otomano',     nome:'Império Otomano', d:'M660 445 L810 440 L830 580 L680 590 Z' }
+];
+
+/* =========== POSIÇÕES DE LABELS =========== */
+const LABEL_POS = {
+  florenca:[515,495], milao:[495,455], veneza:[545,445], genova:[462,485],
+  papal:[535,532], napoles:[560,585], sicilia:[535,638], sardenha:[470,575],
+  ferrara:[520,470], mantua:[500,472], urbino:[560,497], saboia:[462,453],
+  modena:[498,490], lucca:[488,503], siena:[507,518],
+  castela:[335,515], aragao:[405,488], portugal:[278,520], navarra:[380,462], granada:[345,572],
+  inglaterra:[385,315], escocia:[395,245], irlanda:[315,300],
+  franca:[430,395], borgonha:[480,388], flandres:[478,335], holanda:[495,305],
+  baviera:[538,398], saxonia:[545,355], brandemburgo:[600,320], austria:[578,415], boemia:[588,372],
+  dinamarca:[545,255], suecia:[615,190], noruega:[557,165],
+  polonia:[665,340], hungria:[655,418], lituania:[730,285], moscovia:[850,290], otomano:[740,515]
+};
+
+/* =========== ESTADO =========== */
+const defaultState = () => ({
+  xp: 0,
+  missoes: [],
+  tags: ['Gabinete','ALESC','Plenário','Pós-Graduação','Leitura','Corrida'],
+  regioes: [],                 // ids pintados
+  pomodoros: 0,
+  missionsDone: 0,
+  streak: { count:0, lastDay:null },
+  lastDoneTs: null,
+  vigorUntil: null,
+  activeTab: 'trabalho',
+  filters: { trabalho:'pendentes', estudo:'pendentes', fisico:'pendentes' },
+  muted: false,
+  seenRanks: [],               // para disparar conquista uma única vez
+  battle: { missionId:null }
+});
+
+const STORAGE_KEY = 'conselheiro-do-rei-v1';
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const s = JSON.parse(raw);
+    // merge defensivo
+    return Object.assign(defaultState(), s);
+  }catch(e){
+    return defaultState();
+  }
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.warn('Falha ao salvar', e); }
+}
+
+/* =========== UTIL =========== */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR');
+}
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+
+function rankFor(xp){
+  let cur = RANKS[0], next = RANKS[1];
+  for(let i=0;i<RANKS.length;i++){
+    if(xp >= RANKS[i].min){ cur = RANKS[i]; next = RANKS[i+1]||null; }
+  }
+  return { cur, next, idx: RANKS.indexOf(cur) };
+}
+
+function vigorAtivo(){
+  return state.vigorUntil && Date.now() < state.vigorUntil;
+}
+
+/* =========== NOTIFICAÇÃO =========== */
+let notifTimeout;
+function notif(msg, isAchievement=false){
+  const el = $('#notif');
+  el.textContent = msg;
+  el.className = 'notif show' + (isAchievement?' achievement':'');
+  clearTimeout(notifTimeout);
+  notifTimeout = setTimeout(()=> el.classList.remove('show'), 3500);
+}
+
+/* =========== SOM — Web Audio API =========== */
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+    catch(e){ return null; }
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, dur=.2, type='sine', vol=.15, when=0){
+  if(state.muted) return;
+  const ctx = getCtx(); if(!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = 0;
+  o.connect(g); g.connect(ctx.destination);
+  const t = ctx.currentTime + when;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t + .01);
+  g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.start(t); o.stop(t + dur + .02);
+}
+function somConclusao(){
+  // acorde maior arpejado — vitória
+  beep(523.25,.15,'triangle',.18,0);       // C5
+  beep(659.25,.15,'triangle',.18,.08);     // E5
+  beep(783.99,.22,'triangle',.18,.16);     // G5
+  beep(1046.5,.35,'triangle',.2,.26);      // C6
+}
+function somConquista(){
+  // fanfarra
+  beep(392,.18,'triangle',.2,0);   // G4
+  beep(523,.18,'triangle',.2,.14); // C5
+  beep(659,.18,'triangle',.2,.28); // E5
+  beep(784,.18,'triangle',.2,.42); // G5
+  beep(1046,.45,'triangle',.22,.6);// C6
+  // toque brilhante
+  beep(2093,.2,'sine',.08,.8);     // C7
+}
+function somPintura(){
+  beep(880,.12,'sine',.1,0);
+  beep(1318,.2,'sine',.1,.06);
+}
+function somBatalhaInicio(){
+  beep(110,.3,'sawtooth',.12,0);
+  beep(130,.3,'sawtooth',.12,.12);
+  beep(175,.4,'sawtooth',.12,.24);
+}
+function somBatalhaVitoria(){
+  beep(523,.15,'triangle',.18,0);
+  beep(659,.15,'triangle',.18,.12);
+  beep(784,.15,'triangle',.18,.24);
+  beep(1046,.4,'triangle',.22,.36);
+  beep(1318,.5,'triangle',.2,.56);
+}
+function somTick(){
+  beep(1200,.03,'sine',.03,0);
+}
+function somClick(){ beep(800,.04,'sine',.04,0); }
+
+/* =========== INÉRCIA (perda por inatividade) =========== */
+function aplicarInercia(){
+  if(!state.lastDoneTs) return; // nada a perder ainda
+  const now = Date.now();
+  const horasParadas = (now - state.lastDoneTs)/3600000;
+  if(horasParadas < INERCIA_HOURS) return;
+
+  // perde 1 região por cada 24h completas após a primeira
+  const perdas = Math.floor(horasParadas / INERCIA_HOURS);
+  if(perdas > 0 && state.regioes.length > 0){
+    let perdeu = 0;
+    for(let i=0;i<perdas;i++){
+      if(state.regioes.length === 0) break;
+      state.regioes.pop(); // perde a última conquistada
+      perdeu++;
+    }
+    if(perdeu > 0){
+      // atualiza lastDoneTs para evitar múltiplas perdas seguidas
+      state.lastDoneTs = now - (horasParadas - perdas*INERCIA_HOURS)*3600000;
+      saveState();
+      notif(`⚠️ Inércia: o Rei perdeu ${perdeu} província${perdeu>1?'s':''}.`);
+    }
+  }
+}
+
+/* =========== XP / CONQUISTA =========== */
+function ganharXP(valor, silencioso=false){
+  let real = valor;
+  if(vigorAtivo()) real = Math.round(valor * VIGOR_MULT);
+  const rAntes = rankFor(state.xp).cur.n;
+  state.xp += real;
+  const rDepois = rankFor(state.xp).cur;
+  if(!silencioso) notif(`+${real} XP ganhos${vigorAtivo()?' (Vigor ativo)':''}`);
+  if(rAntes !== rDepois.n && !state.seenRanks.includes(rDepois.n)){
+    state.seenRanks.push(rDepois.n);
+    somConquista();
+    setTimeout(()=> notif(`🏆 NOVA PATENTE: ${rDepois.n.toUpperCase()} — ${rDepois.flavor}`, true), 600);
+  }
+  saveState();
+  render();
+}
+
+/* =========== REGIÃO / MAPA =========== */
+function conquistarRegiao(qtd=1, silencioso=false){
+  let conquistadas = 0;
+  for(let i=0;i<qtd;i++){
+    const disponiveis = REGIONS.filter(r => !state.regioes.includes(r.id));
+    if(!disponiveis.length) break;
+    // conquista em ordem: começa pela Itália (terra natal)
+    const proxima = disponiveis[0];
+    state.regioes.push(proxima.id);
+    conquistadas++;
+  }
+  if(conquistadas > 0){
+    somPintura();
+    if(!silencioso) notif(`🗺️ ${conquistadas} província${conquistadas>1?'s':''} pintada${conquistadas>1?'s':''} — ${REGIONS.find(r=>r.id===state.regioes[state.regioes.length-1]).nome}`);
+  }
+  saveState();
+}
+
+/* =========== MISSÕES =========== */
+let editingMission = null;
+
+function abrirModalMissao(tipoDefault, editId=null){
+  editingMission = editId;
+  const m = editId ? state.missoes.find(x=>x.id===editId) : null;
+  $('#modal-title').textContent = m ? 'Editar Missão' : 'Nova Missão';
+  $('#modal-sub').textContent = m ? 'Revise os termos do pergaminho' : 'Defina a próxima empreitada do Conselheiro';
+
+  $('#f-titulo').value = m?.titulo || '';
+  $('#f-desc').value = m?.desc || '';
+  $('#f-data').value = m?.data || '';
+  $('#f-newtag').value = '';
+
+  // tipo
+  const tipo = m?.tipo || tipoDefault || 'trabalho';
+  $$('#tipo-row .radio-card').forEach(c=>{
+    c.classList.toggle('active', c.dataset.tipo===tipo);
+  });
+
+  // peso
+  const peso = m?.peso || 'padrao';
+  $$('#peso-row .radio-card').forEach(c=>{
+    c.classList.toggle('active', c.dataset.peso===peso);
+  });
+  atualizarPreviewXP();
+
+  renderTagsModal(m?.tag || null);
+
+  $('#btn-del-missao').style.display = editId ? 'inline-block' : 'none';
+  $('#modal-missao').classList.add('active');
+  setTimeout(()=> $('#f-titulo').focus(), 100);
+}
+
+function renderTagsModal(tagSelecionada){
+  const cont = $('#tag-existentes');
+  cont.innerHTML = '';
+  state.tags.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tag-chip' + (t===tagSelecionada?' active':'');
+    chip.textContent = t;
+    chip.onclick = ()=>{
+      $$('#tag-existentes .tag-chip').forEach(c=>c.classList.remove('active'));
+      if(chip.classList.contains('active')) chip.classList.remove('active');
+      else chip.classList.add('active');
+    };
+    cont.appendChild(chip);
+  });
+}
+
+function tagAtivaNoModal(){
+  const ativa = $('#tag-existentes .tag-chip.active');
+  return ativa ? ativa.textContent : null;
+}
+
+function tipoSelecionado(){
+  const a = $('#tipo-row .radio-card.active');
+  return a ? a.dataset.tipo : 'trabalho';
+}
+
+function pesoSelecionado(){
+  const a = $('#peso-row .radio-card.active');
+  return a ? a.dataset.peso : 'padrao';
+}
+
+function atualizarPreviewXP(){
+  const tipo = tipoSelecionado();
+  const peso = pesoSelecionado();
+  const xp = Math.round((XP_BASE[tipo]||20) * (PESO_MULT[peso]||1));
+  const el = $('#peso-preview');
+  if(el){
+    const extra = vigorAtivo()
+      ? ` • com Vigor ativo: <b>${Math.round(xp*VIGOR_MULT)}</b>`
+      : '';
+    el.innerHTML = `XP estimado: <b>${xp}</b> (antes de Vigor/Batalha)${extra}`;
+  }
+}
+
+function salvarMissao(){
+  const titulo = $('#f-titulo').value.trim();
+  if(!titulo){ notif('Dê um título à missão.'); $('#f-titulo').focus(); return; }
+  const desc = $('#f-desc').value.trim();
+  const data = $('#f-data').value;
+  const tipo = tipoSelecionado();
+  const peso = pesoSelecionado();
+  const tag = tagAtivaNoModal();
+
+  if(editingMission){
+    const m = state.missoes.find(x=>x.id===editingMission);
+    if(m){ Object.assign(m, { titulo, desc, data, tipo, peso, tag }); }
+  } else {
+    state.missoes.unshift({
+      id: uid(),
+      titulo, desc, data, tipo, peso, tag,
+      done:false,
+      createdAt: Date.now(),
+      doneAt: null
+    });
+  }
+  saveState();
+  fecharModal('modal-missao');
+  somClick();
+  render();
+}
+
+function fecharModal(id){ $('#'+id).classList.remove('active'); }
+
+function adicionarTag(){
+  const v = $('#f-newtag').value.trim();
+  if(!v) return;
+  if(!state.tags.includes(v)) state.tags.push(v);
+  $('#f-newtag').value = '';
+  renderTagsModal(v);
+  saveState();
+}
+
+function deletarMissao(id){
+  state.missoes = state.missoes.filter(m=>m.id!==id);
+  if(state.battle.missionId === id){
+    state.battle.missionId = null;
+    atualizarBattleUI();
+  }
+  saveState();
+  render();
+}
+
+function toggleMissao(id){
+  const m = state.missoes.find(x=>x.id===id);
+  if(!m) return;
+  if(m.done){
+    // desmarcar — não estorna XP (incentivo a manter íntegro)
+    m.done = false;
+    m.doneAt = null;
+    saveState();
+    render();
+    return;
+  }
+  m.done = true;
+  m.doneAt = Date.now();
+  state.missionsDone++;
+  state.lastDoneTs = Date.now();
+  atualizarStreak();
+
+  // XP = base da categoria × peso da missão
+  const xp = xpDaMissao(m);
+  ganharXP(xp);
+
+  // Vigor ao concluir missão física
+  if(m.tipo==='fisico'){
+    state.vigorUntil = Date.now() + VIGOR_HOURS*3600000;
+    saveState();
+    notif(`⚔️ Vigor ativado — ${VIGOR_MULT}x XP por ${VIGOR_HOURS}h.`);
+  }
+
+  somConclusao();
+
+  // Pintura por missões acumuladas (a cada 3)
+  if(state.missionsDone % 3 === 0) conquistarRegiao(1);
+
+  // Diversidade no dia (3 tipos) → bônus
+  verificarDiversidade();
+
+  saveState();
+  render();
+}
+
+function atualizarStreak(){
+  const hoje = todayKey();
+  const last = state.streak.lastDay;
+  if(last === hoje) return; // já contou hoje
+  const ontem = new Date(Date.now() - DIA_MS).toISOString().slice(0,10);
+  if(last === ontem){
+    state.streak.count++;
+  } else {
+    state.streak.count = 1;
+  }
+  state.streak.lastDay = hoje;
+
+  // Streak de 3 dias consecutivos → 1 região bônus
+  if(state.streak.count > 0 && state.streak.count % 3 === 0){
+    conquistarRegiao(1);
+    notif(`🔥 ${state.streak.count} dias consecutivos — província bônus!`);
+  }
+}
+
+function verificarDiversidade(){
+  const hoje = todayKey();
+  const tiposHoje = new Set(
+    state.missoes
+      .filter(m => m.done && m.doneAt && new Date(m.doneAt).toISOString().slice(0,10) === hoje)
+      .map(m => m.tipo)
+  );
+  if(tiposHoje.size === 3){
+    // só concede uma vez por dia
+    const flag = 'diversidade-' + hoje;
+    if(!state.seenRanks.includes(flag)){
+      state.seenRanks.push(flag);
+      conquistarRegiao(1);
+      notif(`✨ Diversidade Estratégica — três frentes no mesmo dia. Província bônus!`);
+    }
+  }
+}
+
+/* =========== FILTRO / RENDER LISTAS =========== */
+function setupFilters(){
+  $$('.filter').forEach(btn=>{
+    btn.onclick = ()=>{
+      const type = btn.dataset.type;
+      const filter = btn.dataset.filter;
+      state.filters[type] = filter;
+      // ativa só os filtros do mesmo tipo
+      $$(`.filter[data-type="${type}"]`).forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      saveState();
+      renderListas();
+    };
+  });
+}
+
+function renderListas(){
+  ['trabalho','estudo','fisico'].forEach(tipo=>{
+    const cont = $(`#list-${tipo}`);
+    const f = state.filters[tipo] || 'pendentes';
+    let ms = state.missoes.filter(m => m.tipo === tipo);
+    if(f === 'pendentes') ms = ms.filter(m=>!m.done);
+    else if(f === 'concluidas') ms = ms.filter(m=>m.done);
+
+    // ordena: pendentes primeiro, por data mais próxima, depois por criação
+    ms.sort((a,b)=>{
+      if(a.done !== b.done) return a.done?1:-1;
+      if(a.data && b.data) return a.data.localeCompare(b.data);
+      if(a.data) return -1;
+      if(b.data) return 1;
+      return (b.createdAt||0) - (a.createdAt||0);
+    });
+
+    cont.innerHTML = '';
+    if(!ms.length){
+      cont.innerHTML = `<div class="empty">Nenhum pergaminho aqui. Registre uma nova missão.</div>`;
+      return;
+    }
+    ms.forEach(m => cont.appendChild(cardMissao(m)));
+  });
+}
+
+function cardMissao(m){
+  const tipoLabel = { trabalho:'⚖️ Razão', estudo:'📜 Virtù', fisico:'⚔️ Armas' }[m.tipo];
+  const peso = m.peso || 'padrao';
+  const pesoInfo = PESO_LABEL[peso] || PESO_LABEL.padrao;
+  const xpReal = xpDaMissao(m);
+  const el = document.createElement('div');
+  el.className = 'mission' + (m.done?' done':'');
+  el.innerHTML = `
+    <button class="check" title="${m.done?'Desmarcar':'Concluir'}" data-act="toggle" data-id="${m.id}">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+    <div class="mission-body">
+      <div class="mission-top">
+        <div class="mission-title">${escapeHtml(m.titulo)}</div>
+        <span class="badge rank ${pesoInfo.cor}">${pesoInfo.icone} ${pesoInfo.nome} · ${xpReal}xp</span>
+        ${m.tag ? `<span class="badge tag">${escapeHtml(m.tag)}</span>` : ''}
+      </div>
+      <div class="mission-meta">
+        <span>${tipoLabel}</span>
+        <span class="sep">•</span>
+        <span>Prazo: ${fmtDate(m.data)}</span>
+        ${m.done && m.doneAt ? `<span class="sep">•</span><span style="color:var(--moss)">Concluída ${fmtDate(new Date(m.doneAt).toISOString().slice(0,10))}</span>`:''}
+      </div>
+      ${m.desc ? `<div class="mission-desc">${escapeHtml(m.desc)}</div>` : ''}
+    </div>
+    <div class="mission-actions">
+      <button class="icon-btn" title="Editar" data-act="edit" data-id="${m.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+      </button>
+      <button class="icon-btn danger" title="Excluir" data-act="del" data-id="${m.id}">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14H7L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+  `;
+  el.querySelector('[data-act="toggle"]').onclick = ()=> toggleMissao(m.id);
+  el.querySelector('[data-act="edit"]').onclick = ()=> abrirModalMissao(m.tipo, m.id);
+  el.querySelector('[data-act="del"]').onclick = ()=>{
+    if(confirm('Excluir esta missão?')) deletarMissao(m.id);
+  };
+  return el;
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+/* =========== MAPA SVG =========== */
+function buildMap(){
+  const svgNS = 'http://www.w3.org/2000/svg';
+  let svg = `<svg xmlns="${svgNS}" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid meet" aria-label="Mapa da Europa">`;
+  // fundo (mar)
+  svg += `<rect class="map-sea" x="0" y="0" width="1000" height="800"/>`;
+  // ornamentos do mar
+  svg += `<text x="150" y="650" font-family="Cinzel,serif" font-size="28" fill="#1a2550" font-style="italic" opacity=".7">Mare Oceanum</text>`;
+  svg += `<text x="700" y="700" font-family="Cinzel,serif" font-size="22" fill="#1a2550" font-style="italic" opacity=".7">Mare Internum</text>`;
+  svg += `<text x="140" y="180" font-family="Cinzel,serif" font-size="22" fill="#1a2550" font-style="italic" opacity=".7">Mare Septentrional</text>`;
+  // bussola
+  svg += `<g transform="translate(910,100)" opacity=".5">
+    <circle r="32" fill="none" stroke="#b8912e" stroke-width=".8"/>
+    <path d="M0 -26 L6 0 L0 26 L-6 0 Z" fill="#b8912e"/>
+    <text y="-35" text-anchor="middle" font-family="Cinzel,serif" font-size="10" fill="#b8912e">N</text>
+  </g>`;
+
+  REGIONS.forEach(r=>{
+    const painted = state.regioes.includes(r.id) ? ' painted' : '';
+    svg += `<path id="reg-${r.id}" class="regiao${painted}" d="${r.d}" data-region="${r.id}"><title>${r.nome}</title></path>`;
+  });
+  REGIONS.forEach(r=>{
+    const [x,y] = LABEL_POS[r.id] || [0,0];
+    const painted = state.regioes.includes(r.id) ? ' painted-label' : '';
+    svg += `<text class="map-label${painted}" x="${x}" y="${y}" text-anchor="middle">${r.nome}</text>`;
+  });
+  svg += `</svg>`;
+  $('#map-wrap').innerHTML = svg;
+}
+
+/* =========== POMODORO =========== */
+const battle = {
+  running:false,
+  startTs:null,
+  elapsed:0,       // segundos rodados
+  tickTimer:null,
+};
+
+function atualizarTimerUI(){
+  const remaining = Math.max(0, POMO_LEN - battle.elapsed);
+  const mm = String(Math.floor(remaining/60)).padStart(2,'0');
+  const ss = String(remaining%60).padStart(2,'0');
+  $('#timer-time').textContent = `${mm}:${ss}`;
+  const perc = battle.elapsed / POMO_LEN;
+  const circ = 2 * Math.PI * 88;
+  $('#ring-fill').setAttribute('stroke-dasharray', `${circ*perc} ${circ}`);
+
+  if(battle.running) $('#timer-phase').textContent = 'Em Batalha';
+  else if(battle.elapsed === 0) $('#timer-phase').textContent = 'Pronto';
+  else $('#timer-phase').textContent = 'Pausado';
+}
+
+function atualizarBattleUI(){
+  // missão vinculada
+  const mid = state.battle.missionId;
+  const m = mid ? state.missoes.find(x=>x.id===mid) : null;
+  $('#timer-mission').textContent = m
+    ? `⚔️ Em nome de: "${m.titulo}"${m.done?' (concluída)':''}`
+    : 'Nenhuma missão vinculada';
+
+  $('#btn-battle-start').textContent = battle.running ? 'Pausar' : (battle.elapsed>0?'Continuar':'Iniciar Batalha');
+  $('#btn-battle-reset').style.display = battle.elapsed>0 ? 'inline-block' : 'none';
+  atualizarTimerUI();
+}
+
+function iniciarOuPausar(){
+  if(battle.running){
+    pausarBatalha();
+  } else {
+    iniciarBatalha();
+  }
+}
+
+function iniciarBatalha(){
+  battle.running = true;
+  battle.startTs = Date.now() - battle.elapsed*1000;
+  battle.tickTimer = setInterval(tickBatalha, 1000);
+  somBatalhaInicio();
+  atualizarBattleUI();
+}
+
+function pausarBatalha(){
+  battle.running = false;
+  clearInterval(battle.tickTimer);
+  atualizarBattleUI();
+}
+
+function resetarBatalha(){
+  if(!confirm('Render-se? A batalha será abandonada sem recompensa.')) return;
+  battle.running = false;
+  battle.elapsed = 0;
+  clearInterval(battle.tickTimer);
+  atualizarBattleUI();
+  notif('Você recuou da arena. Nenhuma recompensa.');
+}
+
+function tickBatalha(){
+  battle.elapsed = Math.floor((Date.now() - battle.startTs)/1000);
+  if(battle.elapsed >= POMO_LEN){
+    finalizarBatalha(true);
+    return;
+  }
+  atualizarTimerUI();
+}
+
+function finalizarBatalha(vitoria){
+  battle.running = false;
+  battle.elapsed = 0;
+  clearInterval(battle.tickTimer);
+  if(vitoria){
+    somBatalhaVitoria();
+    state.pomodoros++;
+    ganharXP(POMO_BONUS, true);
+    conquistarRegiao(1);
+
+    const mid = state.battle.missionId;
+    const m = mid ? state.missoes.find(x=>x.id===mid) : null;
+    if(m && !m.done){
+      // oferece concluir
+      setTimeout(()=>{
+        if(confirm(`Vitória na Disputa Política!\n\nDeseja também marcar "${m.titulo}" como concluída? (+${POMO_TASK_BONUS} XP de espólio)`)){
+          toggleMissao(m.id);
+          ganharXP(POMO_TASK_BONUS, true);
+          notif(`⚔️ Espólio da vitória: +${POMO_TASK_BONUS} XP extras!`);
+        }
+      }, 400);
+    }
+    notif(`🏆 VITÓRIA! +${POMO_BONUS} XP e 1 província pintada no mapa.`, true);
+  }
+  atualizarBattleUI();
+  saveState();
+  render();
+}
+
+function abrirModalVincular(){
+  const cont = $('#list-vincular');
+  const ms = state.missoes.filter(m=>!m.done);
+  if(!ms.length){
+    cont.innerHTML = `<div class="empty">Nenhuma missão pendente para vincular.</div>`;
+  } else {
+    cont.innerHTML = '';
+    ms.forEach(m=>{
+      const div = document.createElement('div');
+      div.className = 'mission';
+      div.style.cursor = 'pointer';
+      if(state.battle.missionId === m.id) div.style.borderColor = 'var(--gold)';
+      div.innerHTML = `
+        <div class="check"></div>
+        <div class="mission-body">
+          <div class="mission-title">${escapeHtml(m.titulo)}</div>
+          <div class="mission-meta">
+            <span>${{trabalho:'⚖️ Razão',estudo:'📜 Virtù',fisico:'⚔️ Armas'}[m.tipo]}</span>
+            ${m.tag?`<span class="sep">•</span><span>${escapeHtml(m.tag)}</span>`:''}
+          </div>
+        </div>
+        <div></div>
+      `;
+      div.onclick = ()=>{
+        state.battle.missionId = m.id;
+        saveState();
+        atualizarBattleUI();
+        fecharModal('modal-vincular');
+        notif(`Missão vinculada à próxima batalha.`);
+      };
+      cont.appendChild(div);
+    });
+  }
+  $('#modal-vincular').classList.add('active');
+}
+
+/* =========== NAV =========== */
+function irPara(tab){
+  state.activeTab = tab;
+  $$('.panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===tab));
+  $$('.nav-item').forEach(b=>b.classList.toggle('active', b.dataset.nav===tab));
+  if(tab === 'continente') buildMap();
+  if(tab === 'batalha') atualizarBattleUI();
+  saveState();
+  somClick();
+}
+
+/* =========== SAVE/LOAD/RESET =========== */
+function exportarSave(){
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    state
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `conselheiro-cronica-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  notif('📜 Crônica exportada.');
+}
+
+function importarSave(file){
+  const reader = new FileReader();
+  reader.onload = e =>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(data.state){
+        state = Object.assign(defaultState(), data.state);
+        saveState();
+        render();
+        notif('📜 Crônica restaurada.');
+      } else {
+        notif('Arquivo inválido.');
+      }
+    }catch(err){ notif('Falha ao restaurar: arquivo inválido.'); }
+  };
+  reader.readAsText(file);
+}
+
+function reiniciarJogo(){
+  state = defaultState();
+  saveState();
+  render();
+  fecharModal('modal-reset');
+  notif('⚰️ O jogo recomeça. Nova crônica inaugurada.');
+}
+
+/* =========== RENDER GERAL =========== */
+function render(){
+  // rank / xp
+  const r = rankFor(state.xp);
+  $('#xp-total').textContent = state.xp.toLocaleString('pt-BR');
+  $('#stat-rank').textContent = r.cur.n;
+  $('#rank-subtitle').innerHTML = `<b>${r.cur.n}</b> — <span>${r.cur.flavor}</span>`;
+  if(r.next){
+    const rest = r.next.min - state.xp;
+    $('#stat-next').textContent = `${rest.toLocaleString('pt-BR')} XP`;
+    const span = r.next.min - r.cur.min;
+    const prog = (state.xp - r.cur.min) / span;
+    $('#xp-fill').style.width = `${Math.min(100, prog*100).toFixed(1)}%`;
+  } else {
+    $('#stat-next').textContent = 'Patente máxima';
+    $('#xp-fill').style.width = '100%';
+  }
+
+  // stats
+  $('#stat-regions').textContent = `${state.regioes.length}/${REGIONS.length}`;
+  $('#stat-done').textContent = state.missoes.filter(m=>m.done).length.toLocaleString('pt-BR');
+  $('#m-dominio').textContent = `${state.regioes.length}/${REGIONS.length}`;
+  $('#m-streak').textContent = state.streak.count;
+  $('#m-pomos').textContent = state.pomodoros;
+
+  // vigor
+  if(vigorAtivo()){
+    const ms = state.vigorUntil - Date.now();
+    const h = Math.floor(ms/3600000);
+    const mm = Math.floor((ms%3600000)/60000);
+    $('#vigor-status').style.display='block';
+    $('#vigor-mult').textContent = VIGOR_MULT+'x';
+    $('#vigor-exp').textContent = `${h}h ${mm}m`;
+  } else {
+    $('#vigor-status').style.display='none';
+  }
+
+  // listas
+  renderListas();
+  if(state.activeTab === 'continente') buildMap();
+}
+
+/* =========== EVENTS =========== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Nav
+  $$('.nav-item').forEach(b=> b.addEventListener('click', ()=> irPara(b.dataset.nav)));
+
+  // Tipo no modal
+  $$('#tipo-row .radio-card').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      $$('#tipo-row .radio-card').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      atualizarPreviewXP();
+    });
+  });
+
+  // Peso no modal
+  $$('#peso-row .radio-card').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      $$('#peso-row .radio-card').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      atualizarPreviewXP();
+    });
+  });
+
+  // Save / Load / Reset
+  $('#btn-save').onclick = exportarSave;
+  $('#btn-load').onclick = ()=> $('#file-load').click();
+  $('#file-load').addEventListener('change', e=>{
+    if(e.target.files[0]) importarSave(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('#btn-reset').onclick = ()=> $('#modal-reset').classList.add('active');
+  $('#btn-confirm-reset').onclick = reiniciarJogo;
+
+  // Modal missão
+  $('#btn-save-missao').onclick = salvarMissao;
+  $('#btn-del-missao').onclick = ()=>{
+    if(editingMission && confirm('Excluir esta missão?')){
+      deletarMissao(editingMission);
+      fecharModal('modal-missao');
+    }
+  };
+  $('#f-newtag').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); adicionarTag(); }
+  });
+
+  // Mute
+  $('#btn-mute').onclick = ()=>{
+    state.muted = !state.muted;
+    saveState();
+    $('#btn-mute').classList.toggle('muted', state.muted);
+    notif(state.muted ? '🔇 Silêncio na Corte' : '🔔 O som retorna');
+  };
+  if(state.muted) $('#btn-mute').classList.add('muted');
+
+  // Batalha
+  $('#btn-battle-start').onclick = iniciarOuPausar;
+  $('#btn-battle-reset').onclick = resetarBatalha;
+  $('#btn-battle-link').onclick = abrirModalVincular;
+  $('#btn-desvincular').onclick = ()=>{
+    state.battle.missionId = null;
+    saveState();
+    atualizarBattleUI();
+    fecharModal('modal-vincular');
+  };
+
+  // Fechar modal clicando fora
+  $$('.modal-bg').forEach(bg=>{
+    bg.addEventListener('click', e=>{
+      if(e.target === bg) bg.classList.remove('active');
+    });
+  });
+
+  // Setup filtros
+  setupFilters();
+  Object.keys(state.filters).forEach(t=>{
+    const f = state.filters[t];
+    $$(`.filter[data-type="${t}"]`).forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+  });
+
+  // Inércia — aplica ao abrir
+  aplicarInercia();
+
+  // Render inicial
+  irPara(state.activeTab || 'trabalho');
+  render();
+
+  // Interval para atualizar vigor timer
+  setInterval(()=>{ if(vigorAtivo()) render(); }, 60000);
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  }
+
+  // Hash routes (atalhos PWA)
+  if(location.hash === '#batalha') irPara('batalha');
+  if(location.hash === '#nova-missao') abrirModalMissao('trabalho');
+});
+
+// expostas globalmente (para onclicks inline)
+window.abrirModalMissao = abrirModalMissao;
+window.fecharModal = fecharModal;
+</script>
+</body>
+</html>
+      c.classList.add('active');
+      atualizarPreviewXP();
+    });
+  });
+
+  // Save / Load / Reset
+  $('#btn-save').onclick = exportarSave;
+  $('#btn-load').onclick = ()=> $('#file-load').click();
+  $('#file-load').addEventListener('change', e=>{
+    if(e.target.files[0]) importarSave(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('#btn-reset').onclick = ()=> $('#modal-reset').classList.add('active');
+  $('#btn-confirm-reset').onclick = reiniciarJogo;
+
+  // Modal missão
+  $('#btn-save-missao').onclick = salvarMissao;
+  $('#btn-del-missao').onclick = ()=>{
+    if(editingMission && confirm('Excluir esta missão?')){
+      deletarMissao(editingMission);
+      fecharModal('modal-missao');
+    }
+  };
+  $('#f-newtag').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); adicionarTag(); }
+  });
+
+  // Mute
+  $('#btn-mute').onclick = ()=>{
+    state.muted = !state.muted;
+    saveState();
+    $('#btn-mute').classList.toggle('muted', state.muted);
+    notif(state.muted ? '🔇 Silêncio na Corte' : '🔔 O som retorna');
+  };
+  if(state.muted) $('#btn-mute').classList.add('muted');
+
+  // Batalha
+  $('#btn-battle-start').onclick = iniciarOuPausar;
+  $('#btn-battle-reset').onclick = resetarBatalha;
+  $('#btn-battle-link').onclick = abrirModalVincular;
+  $('#btn-desvincular').onclick = ()=>{
+    state.battle.missionId = null;
+    saveState();
+    atualizarBattleUI();
+    fecharModal('modal-vincular');
+  };
+
+  // Fechar modal clicando fora
+  $$('.modal-bg').forEach(bg=>{
+    bg.addEventListener('click', e=>{
+      if(e.target === bg) bg.classList.remove('active');
+    });
+  });
+
+  // Setup filtros
+  setupFilters();
+  // restaura filtros visuais
+  Object.keys(state.filters).forEach(t=>{
+    const f = state.filters[t];
+    $$(`.filter[data-type="${t}"]`).forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+  });
+
+  // Inércia — aplica ao abrir
+  aplicarInercia();
+
+  // Render inicial
+  irPara(state.activeTab || 'trabalho');
+  render();
+
+  // Interval para atualizar vigor timer
+  setInterval(()=>{
+    if(vigorAtivo()) render();
+  }, 60000);
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  }
+
+  // Hash routes (atalhos PWA)
+  if(location.hash === '#batalha') irPara('batalha');
+  if(location.hash === '#nova-missao') abrirModalMissao('trabalho');
+});
+
+// persiste progresso do pomodoro se usuário recarregar
+window.addEventListener('beforeunload', ()=>{
+  if(battle.running){
+    // salva no state
+    state._battleResume = { elapsed: battle.elapsed, ts: Date.now() };
+    saveState();
+  }
+});
+
+// expostas globalmente (para onclicks inline)
+window.abrirModalMissao = abrirModalMissao;
+window.fecharModal = fecharModal;
+</script>
+</body>
+</html>
+      c.classList.add('active');
+      atualizarPreviewXP();
+    });
+  });
+
+  // Save / Load / Reset
+  $('#btn-save').onclick = exportarSave;
+  $('#btn-load').onclick = ()=> $('#file-load').click();
+  $('#file-load').addEventListener('change', e=>{
+    if(e.target.files[0]) importarSave(e.target.files[0]);
+    e.target.value = '';
+  });
+  $('#btn-reset').onclick = ()=> $('#modal-reset').classList.add('active');
+  $('#btn-confirm-reset').onclick = reiniciarJogo;
+
+  // Modal missão
+  $('#btn-save-missao').onclick = salvarMissao;
+  $('#btn-del-missao').onclick = ()=>{
+    if(editingMission && confirm('Excluir esta missão?')){
+      deletarMissao(editingMission);
+      fecharModal('modal-missao');
+    }
+  };
+  $('#f-newtag').addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); adicionarTag(); }
+  });
+
+  // Mute
+  $('#btn-mute').onclick = ()=>{
+    state.muted = !state.muted;
+    saveState();
+    $('#btn-mute').classList.toggle('muted', state.muted);
+    notif(state.muted ? '🔇 Silêncio na Corte' : '🔔 O som retorna');
+  };
+  if(state.muted) $('#btn-mute').classList.add('muted');
+
+  // Batalha
+  $('#btn-battle-start').onclick = iniciarOuPausar;
+  $('#btn-battle-reset').onclick = resetarBatalha;
+  $('#btn-battle-link').onclick = abrirModalVincular;
+  $('#btn-desvincular').onclick = ()=>{
+    state.battle.missionId = null;
+    saveState();
+    atualizarBattleUI();
+    fecharModal('modal-vincular');
+  };
+
+  // Fechar modal clicando fora
+  $$('.modal-bg').forEach(bg=>{
+    bg.addEventListener('click', e=>{
+      if(e.target === bg) bg.classList.remove('active');
+    });
+  });
+
+  // Setup filtros
+  setupFilters();
+  Object.keys(state.filters).forEach(t=>{
+    const f = state.filters[t];
+    $$(`.filter[data-type="${t}"]`).forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
+  });
+
+  // Inércia
+  aplicarInercia();
+
+  // Render inicial
+  irPara(state.activeTab || 'trabalho');
+  render();
+
+  setInterval(()=>{ if(vigorAtivo()) render(); }, 60000);
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+  }
+
+  if(location.hash === '#batalha') irPara('batalha');
+  if(location.hash === '#nova-missao') abrirModalMissao('trabalho');
+});
+
+window.abrirModalMissao = abrirModalMissao;
+window.fecharModal = fecharModal;
+</script>
+</body>
+</html>
+);
+});
+
+window.abrirModalMissao = abrirModalMissao;
+window.fecharModal = fecharModal;
+</script>
+</body>
+</html>
+Modal = fecharModal;
+</script>
+</body>
+</html>
